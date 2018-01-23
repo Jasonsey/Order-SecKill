@@ -1,6 +1,5 @@
 # coding=utf-8
 
-
 import requests
 
 
@@ -55,7 +54,6 @@ def order():
         print('ordering……', order_request.json()['message'])
     else:
         print('已取消预定～')
-
 
 
 if __name__ == '__main__':
