@@ -8,10 +8,13 @@ lunch_info = {}
 dish_list = []
 user_info = {}
 
+user_name = '2017***'
+user_pass = '2017***'
+
 
 def login():
     global user_info
-    payload = {'user_name': '2017207', 'passwd': '2017207'}
+    payload = {'user_name': user_name, 'passwd': user_pass}
     login_request = ss.post('http://dc.dianchu.cc:8013/api/frontend/login', data=payload)
     info = login_request.json()['user_info']
     user_info = {'user_id': info['id'], 'user_name': info['employee_name'], 'floor': info['position']}
