@@ -2,7 +2,6 @@
 
 import requests
 
-
 ss = requests.Session()
 lunch_info = {}
 dish_list = []
@@ -33,24 +32,32 @@ def get_lunch_list():
 
 def get_dish_list():
     global dish_list, lunch_info
-    payload = {"cmd": 2, "busi_id": lunch_info['busi_id'], "select_id":  lunch_info['select_id']}
+    payload = {"cmd": 2, "busi_id": lunch_info['busi_id'], "select_id": lunch_info['select_id']}
     dish_request = ss.post('http://dc.dianchu.cc:8013/api/frontend/select_order', json=payload)
     dish_list.extend(dish_request.json()['menu_data'])
-    # print(dish_list)
+    # print(dish_list[0])
 
 
 def order():
     global lunch_info, dish_list, user_info
-    payload = {'floor': user_info['floor'], 'order_menu': [], 'select_id': lunch_info['select_id'], 'user_id': user_info['user_id']}
+    payload = {'floor': user_info['floor'], 'order_menu': [], 'select_id': lunch_info['select_id'],
+               'user_id': user_info['user_id']}
     dish = {}
     for i in dish_list:
-        if not dish.get('actual_price'):
+        if not dish.get('dis_price'):
             dish = i
-        elif i['actual_price'] > dish['actual_price']:
+        elif i['dis_price'] > dish['dis_price']:
             dish = i
-    payload['order_menu'].append({'busi_id': lunch_info['busi_id'], 'busi_name': lunch_info['busi_name'], 'menu': [dish]})
 
-    print('即将预定：', lunch_info['busi_name'], dish['menu_name'], dish['actual_price'])
+    # 配置：下单一份，下单总价=菜单实际加个
+    dish['food_count'] = 1
+    dish['total_price'] = dish['dis_price']
+    # print('dish', dish)
+
+    payload['order_menu'].append(
+        {'busi_id': lunch_info['busi_id'], 'busi_name': lunch_info['busi_name'], 'menu': [dish]})
+
+    print('即将预定：', lunch_info['busi_name'], dish['menu_name'], dish['dis_price'])
     user_check = input('是否预定（[y]/n）？')
     if user_check != 'n':
         order_request = ss.post('http://dc.dianchu.cc:8013/api/frontend/order', json=payload)
@@ -64,5 +71,3 @@ if __name__ == '__main__':
     get_lunch_list()
     get_dish_list()
     order()
-
-
